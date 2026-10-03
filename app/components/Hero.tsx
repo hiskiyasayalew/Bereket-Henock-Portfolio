@@ -1,32 +1,22 @@
 "use client";
 
 import React, {
-  useState,
-  useRef,
-  useEffect,
+  memo,
   useCallback,
+  useEffect,
+  useRef,
+  useState,
 } from "react";
 
-/* ============================================================================
-   PORTRAIT SIZE CONFIGURATION (PHONES, SMALL DEVICES, & MINI IPADS)
-   - 'mobileTranslateY': Controls how high the portrait moves up into the backdrop circle
-   - 'mobileScale': Increases/decreases image size on phones and mini iPads
-   - 'mobileWidth': Adjusts the container width on phones and mini iPads
-============================================================================ */
 const PORTRAIT_CONFIG = {
   mobileWidth:
     "w-[94vw] max-w-[520px] sm:max-w-[600px] md:max-w-[680px] [@media(max-height:500px)_and_(orientation:landscape)]:max-w-[360px]",
-
   mobileScale:
     "scale-125 xs:scale-140 sm:scale-130 md:scale-120 lg:scale-100 [@media(max-height:500px)_and_(orientation:landscape)]:scale-100",
-
   mobileTranslateY:
     "-translate-y-28 xs:-translate-y-28 sm:-translate-y-24 md:-translate-y-20 min-[1025px]:-translate-y-75 xl:translate-y-0 [@media(max-height:500px)_and_(orientation:landscape)]:translate-y-0",
-
   mobileMaxHeight: "88vh",
-
   desktopWidth: "lg:max-w-[840px]",
-
   desktopMaxHeight: "82vh",
 };
 
@@ -34,8 +24,8 @@ interface HeroProps {
   portraitSrc?: string;
   name?: string;
   tagline?: string;
-  portraitMobileScale?: string; // Optional: custom scale override e.g. "scale-140"
-  portraitMobileWidth?: string; // Optional: custom width override e.g. "w-[95vw]"
+  portraitMobileScale?: string;
+  portraitMobileWidth?: string;
 }
 
 interface WorkItem {
@@ -59,10 +49,6 @@ interface SocialLink {
   angle: number;
 }
 
-/* ============================================================================
-   SOCIAL LINKS
-============================================================================ */
-
 const SOCIAL_LINKS: SocialLink[] = [
   {
     label: "WhatsApp",
@@ -78,7 +64,7 @@ const SOCIAL_LINKS: SocialLink[] = [
   },
   {
     label: "Phone",
-    href: "tel:+251 98 665 6879",
+    href: "tel:+251986656879",
     icon: "phone",
     angle: 144,
   },
@@ -96,10 +82,6 @@ const SOCIAL_LINKS: SocialLink[] = [
   },
 ];
 
-/* ============================================================================
-   EXACT 5-POINT ORBIT CO-ORDINATES (GUIDED BY CIRCLE CURVE)
-============================================================================ */
-
 const ORBIT_POINTS = [
   { left: "50%", top: "0%" },
   { left: "97.55%", top: "34.55%" },
@@ -108,13 +90,80 @@ const ORBIT_POINTS = [
   { left: "2.45%", top: "34.55%" },
 ];
 
+const WORKS_LIST: WorkItem[] = [
+  {
+    id: "1",
+    title: "2 September 2026",
+    category: "Commercial/Ad",
+    youtubeId: "bYQMCb9t86E",
+  },
+  {
+    id: "2",
+    title: "Try or Dump | Yorgo",
+    category: "Commercial/Ad",
+    youtubeId: "laRCroS4zWc",
+  },
+  {
+    id: "3",
+    title: "Food review | Andiamo",
+    category: "Commercial/Ad",
+    youtubeId: "gDbmKeoSSDI",
+  },
+  {
+    id: "4",
+    title: "Smoothie prep | Yorgo",
+    category: "Commercial/Ad",
+    youtubeId: "JRkhENuh7fc",
+  },
+  {
+    id: "5",
+    title: "CTA | Chewata Games",
+    category: "Commercial/Ad",
+    youtubeId: "3i3Wt3DMouQ",
+  },
+  {
+    id: "6",
+    title: "Misunderstanding - Andiamo",
+    category: "Commercial/Ad",
+    youtubeId: "3qDmFGWfp0I",
+  },
+  {
+    id: "7",
+    title: "Alahorno dish prep | Yorgo",
+    category: "Commercial/Ad",
+    youtubeId: "QSNB14GCTmY",
+  },
+  {
+    id: "8",
+    title: "Restaurant Commercial | Andiamo(01)",
+    category: "Commercial/Ad",
+    youtubeId: "zfMilaY7mYk",
+  },
+  {
+    id: "9",
+    title: "Food prep | Yorgo(01)",
+    category: "Commercial/Ad",
+    youtubeId: "LJEIL-RfVjM",
+  },
+  {
+    id: "10",
+    title: "Event Recap | Chewata Games",
+    category: "Commercial/Ad",
+    youtubeId: "-QE2cNNogVI",
+  },
+];
+
+const GLITCH_GLYPHS = "!<>-_\\/[]{}—=+*^?#0123456789";
+
 /* ============================================================================
-   SOCIAL ICON COMPONENT
+   SOCIAL ICON
 ============================================================================ */
 
-const SocialIcon: React.FC<{
+const SocialIcon = memo(function SocialIcon({
+  name,
+}: {
   name: SocialIconName;
-}> = ({ name }) => {
+}) {
   if (name === "whatsapp") {
     return (
       <svg
@@ -197,12 +246,7 @@ const SocialIcon: React.FC<{
           stroke="currentColor"
           strokeWidth="1.7"
         />
-        <circle
-          cx="17.5"
-          cy="6.5"
-          r="1"
-          fill="currentColor"
-        />
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
       </svg>
     );
   }
@@ -220,13 +264,11 @@ const SocialIcon: React.FC<{
       />
     </svg>
   );
-};
+});
 
 /* ============================================================================
-   GLITCH TEXT ENGINE
+   GLITCH SCRAMBLE
 ============================================================================ */
-
-const GLITCH_GLYPHS = "!<>-_\\/[]{}—=+*^?#0123456789";
 
 const scrambleElement = (
   element: HTMLElement,
@@ -253,10 +295,7 @@ const scrambleElement = (
 
       if (character === " ") {
         output += " ";
-        continue;
-      }
-
-      if (i < revealCount - 1) {
+      } else if (i < revealCount - 1) {
         output += character;
       } else {
         output +=
@@ -277,6 +316,7 @@ const scrambleElement = (
 
   return () => {
     cancelAnimationFrame(animationFrame);
+    element.textContent = finalText;
   };
 };
 
@@ -284,7 +324,7 @@ const scrambleElement = (
    HERO
 ============================================================================ */
 
-export const Hero: React.FC<HeroProps> = ({
+const Hero: React.FC<HeroProps> = ({
   portraitSrc = "/portrait.png",
   name = "Bereket Henock",
   tagline = "Creative Developer & Visual Designer",
@@ -293,192 +333,382 @@ export const Hero: React.FC<HeroProps> = ({
 }) => {
   const [activeFullscreenVideo, setActiveFullscreenVideo] =
     useState<string | null>(null);
+
   const [orbitPaused, setOrbitPaused] = useState(false);
 
-  const worksList: WorkItem[] = [
-    {
-      id: "1",
-      title: "2 September 2026",
-      category: "Commercial/Ad",
-      youtubeId: "bYQMCb9t86E",
-    },
-    {
-      id: "2",
-      title: "Try or Dump | Yorgo",
-      category: "Commercial/Ad",
-      youtubeId: "laRCroS4zWc",
-    },
-    {
-      id: "3",
-      title: "Food review | Andiamo",
-      category: "Commercial/Ad",
-      youtubeId: "gDbmKeoSSDI",
-    },
-    {
-      id: "4",
-      title: "Smoothie prep | Yorgo",
-      category: "Commercial/Ad",
-      youtubeId: "JRkhENuh7fc",
-    },
-    {
-      id: "5",
-      title: "CTA | Chewata Games",
-      category: "Commercial/Ad",
-      youtubeId: "3i3Wt3DMouQ",
-    },
-    {
-      id: "6",
-      title: "Misunderstanding - Andiamo",
-      category: "Commercial/Ad",
-      youtubeId: "3qDmFGWfp0I",
-    },
-    {
-      id: "7",
-      title: "Alahorno dish prep | Yorgo",
-      category: "Commercial/Ad",
-      youtubeId: "QSNB14GCTmY",
-    },
-    {
-      id: "8",
-      title: "Restaurant Commercial | Andiamo(01)",
-      category: "Commercial/Ad",
-      youtubeId: "zfMilaY7mYk",
-    },
-     {
-      id: "9",
-      title: "Food prep | Yorgo(01)",
-      category: "Commercial/Ad",
-      youtubeId: "LJEIL-RfVjM",
-    },
-      {
-      id: "10",
-      title: "Event Recap | Chewata Games",
-      category: "Commercial/Ad",
-      youtubeId: "-QE2cNNogVI",
-    },
-  ];
+  const [sliderPosition, setSliderPosition] = useState(50);
 
-  const [sliderPosition, setSliderPosition] = useState<number>(50);
-  const isDraggingRef = useRef<boolean>(false);
-  const comparisonContainerRef = useRef<HTMLDivElement | null>(null);
-  const beforeVideoRef = useRef<HTMLVideoElement | null>(null);
-  const afterVideoRef = useRef<HTMLVideoElement | null>(null);
+  const isDraggingRef = useRef(false);
+
+  const comparisonContainerRef =
+    useRef<HTMLDivElement | null>(null);
+
+  const beforeVideoRef =
+    useRef<HTMLVideoElement | null>(null);
+
+  const afterVideoRef =
+    useRef<HTMLVideoElement | null>(null);
+
   const heroRef = useRef<HTMLDivElement | null>(null);
-  const heroContentRef = useRef<HTMLDivElement | null>(null);
+
+  const heroContentRef =
+    useRef<HTMLDivElement | null>(null);
+
   const aboutRef = useRef<HTMLElement | null>(null);
-  const aboutGlitchHasRun = useRef(false);
+
+  const aboutGlitchHasRun =
+    useRef(false);
+
+  /* ==========================================================================
+     VIDEO SYNCHRONIZATION
+  ========================================================================== */
 
   useEffect(() => {
-    const v1 = beforeVideoRef.current;
-    const v2 = afterVideoRef.current;
-    if (!v1 || !v2) return;
+    const beforeVideo = beforeVideoRef.current;
+    const afterVideo = afterVideoRef.current;
 
-    const syncPlayback = () => {
-      if (Math.abs(v1.currentTime - v2.currentTime) > 0.08) {
-        v2.currentTime = v1.currentTime;
+    if (!beforeVideo || !afterVideo) {
+      return;
+    }
+
+    let animationFrame = 0;
+
+    const syncVideos = () => {
+      animationFrame = 0;
+
+      if (
+        beforeVideo.readyState < 2 ||
+        afterVideo.readyState < 2
+      ) {
+        return;
+      }
+
+      const difference = Math.abs(
+        beforeVideo.currentTime -
+          afterVideo.currentTime
+      );
+
+      if (difference > 0.08) {
+        try {
+          afterVideo.currentTime =
+            beforeVideo.currentTime;
+        } catch {
+          // Ignore seek errors while media is initializing.
+        }
       }
     };
 
-    v1.addEventListener("timeupdate", syncPlayback);
-    return () => {
-      v1.removeEventListener("timeupdate", syncPlayback);
-    };
-  }, []);
+    const handleTimeUpdate = () => {
+      if (animationFrame) {
+        return;
+      }
 
-  /* ============================================================================
-     HERO CONTENT FADE ON SCROLL (ZERO Y-MOVEMENT)
-  ============================================================================ */
-  useEffect(() => {
-    let raf = 0;
-
-    const updateHeroFade = () => {
-      const hero = heroRef.current;
-      const content = heroContentRef.current;
-      if (!hero || !content) return;
-
-      const rect = hero.getBoundingClientRect();
-      const fadeDistance = window.innerHeight * 0.75;
-      const scrolled = Math.max(0, -rect.top);
-      const progress = Math.min(scrolled / fadeDistance, 1);
-      const opacity = 1 - progress;
-
-      content.style.opacity = opacity.toString();
-      content.style.pointerEvents = opacity > 0.05 ? "auto" : "none";
+      animationFrame =
+        requestAnimationFrame(syncVideos);
     };
 
-    const handleScroll = () => {
-      if (raf) cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(updateHeroFade);
-    };
-
-    updateHeroFade();
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    window.addEventListener("resize", handleScroll);
-
-    return () => {
-      if (raf) cancelAnimationFrame(raf);
-      window.removeEventListener("scroll", handleScroll);
-      window.removeEventListener("resize", handleScroll);
-    };
-  }, []);
-
-  /* ============================================================================
-     ABOUT SECTION GLITCH OBSERVER
-  ============================================================================ */
-  useEffect(() => {
-    const about = aboutRef.current;
-    if (!about) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0];
-        if (!entry.isIntersecting || aboutGlitchHasRun.current) return;
-
-        aboutGlitchHasRun.current = true;
-        const elements = Array.from(
-          about.querySelectorAll<HTMLElement>("[data-glitch-text]")
-        );
-        const cleanups: Array<() => void> = [];
-
-        elements.forEach((element, index) => {
-          const finalText =
-            element.dataset.glitchText || element.textContent || "";
-          window.setTimeout(() => {
-            const cleanup = scrambleElement(element, finalText, 750);
-            cleanups.push(cleanup);
-          }, index * 90);
-        });
-
-        return () => {
-          cleanups.forEach((cleanup) => cleanup());
-        };
-      },
-      { threshold: 0.18 }
+    beforeVideo.addEventListener(
+      "timeupdate",
+      handleTimeUpdate
     );
 
-    observer.observe(about);
     return () => {
-      observer.disconnect();
+      beforeVideo.removeEventListener(
+        "timeupdate",
+        handleTimeUpdate
+      );
+
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
     };
   }, []);
 
-  const handleMove = useCallback((clientX: number) => {
-    if (!comparisonContainerRef.current) return;
-    const rect = comparisonContainerRef.current.getBoundingClientRect();
-    const offsetX = clientX - rect.left;
-    const percentage = Math.min(Math.max((offsetX / rect.width) * 100, 0), 100);
-    setSliderPosition(percentage);
+  /* ==========================================================================
+     HERO FADE
+  ========================================================================== */
+
+  useEffect(() => {
+    let animationFrame = 0;
+
+    const updateFade = () => {
+      animationFrame = 0;
+
+      const hero = heroRef.current;
+      const content = heroContentRef.current;
+
+      if (!hero || !content) {
+        return;
+      }
+
+      const rect = hero.getBoundingClientRect();
+
+      const fadeDistance =
+        window.innerHeight * 0.75;
+
+      const scrolled = Math.max(
+        0,
+        -rect.top
+      );
+
+      const progress = Math.min(
+        scrolled / fadeDistance,
+        1
+      );
+
+      const opacity = 1 - progress;
+
+      content.style.opacity =
+        opacity.toString();
+
+      content.style.pointerEvents =
+        opacity > 0.05
+          ? "auto"
+          : "none";
+    };
+
+    const requestUpdate = () => {
+      if (animationFrame) {
+        return;
+      }
+
+      animationFrame =
+        requestAnimationFrame(updateFade);
+    };
+
+    requestUpdate();
+
+    window.addEventListener(
+      "scroll",
+      requestUpdate,
+      { passive: true }
+    );
+
+    window.addEventListener(
+      "resize",
+      requestUpdate,
+      { passive: true }
+    );
+
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame);
+      }
+
+      window.removeEventListener(
+        "scroll",
+        requestUpdate
+      );
+
+      window.removeEventListener(
+        "resize",
+        requestUpdate
+      );
+    };
   }, []);
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    handleMove(e.touches[0].clientX);
-  };
+  /* ==========================================================================
+     HERO IMAGE READY
+  ========================================================================== */
 
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (isDraggingRef.current) {
-      handleMove(e.clientX);
+  const handlePortraitLoad = useCallback(() => {
+    if (heroRef.current) {
+      heroRef.current.dataset.heroReady = "true";
     }
-  };
+
+    window.dispatchEvent(
+      new Event("hero-ready")
+    );
+  }, []);
+
+  /* ==========================================================================
+     ABOUT GLITCH
+  ========================================================================== */
+
+  useEffect(() => {
+    const about = aboutRef.current;
+
+    if (!about) {
+      return;
+    }
+
+    const timeoutIds: number[] = [];
+    const cleanupAnimations: Array<() => void> = [];
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          const entry = entries[0];
+
+          if (
+            !entry.isIntersecting ||
+            aboutGlitchHasRun.current
+          ) {
+            return;
+          }
+
+          aboutGlitchHasRun.current = true;
+
+          const elements =
+            Array.from(
+              about.querySelectorAll<HTMLElement>(
+                "[data-glitch-text]"
+              )
+            );
+
+          elements.forEach(
+            (element, index) => {
+              const finalText =
+                element.dataset.glitchText ||
+                element.textContent ||
+                "";
+
+              const timeoutId =
+                window.setTimeout(() => {
+                  const cleanup =
+                    scrambleElement(
+                      element,
+                      finalText,
+                      750
+                    );
+
+                  cleanupAnimations.push(
+                    cleanup
+                  );
+                }, index * 90);
+
+              timeoutIds.push(timeoutId);
+            }
+          );
+        },
+        {
+          threshold: 0.18,
+        }
+      );
+
+    observer.observe(about);
+
+    return () => {
+      observer.disconnect();
+
+      timeoutIds.forEach((timeoutId) => {
+        window.clearTimeout(timeoutId);
+      });
+
+      cleanupAnimations.forEach(
+        (cleanup) => cleanup()
+      );
+    };
+  }, []);
+
+  /* ==========================================================================
+     BEFORE / AFTER SLIDER
+  ========================================================================== */
+
+  const handleMove = useCallback(
+    (clientX: number) => {
+      const container =
+        comparisonContainerRef.current;
+
+      if (!container) {
+        return;
+      }
+
+      const rect =
+        container.getBoundingClientRect();
+
+      if (rect.width <= 0) {
+        return;
+      }
+
+      const offsetX =
+        clientX - rect.left;
+
+      const percentage = Math.min(
+        Math.max(
+          (offsetX / rect.width) * 100,
+          0
+        ),
+        100
+      );
+
+      setSliderPosition((previous) => {
+        if (
+          Math.abs(
+            previous - percentage
+          ) < 0.1
+        ) {
+          return previous;
+        }
+
+        return percentage;
+      });
+    },
+    []
+  );
+
+  const handleMouseDown =
+    useCallback(() => {
+      isDraggingRef.current = true;
+    }, []);
+
+  const handleMouseUp =
+    useCallback(() => {
+      isDraggingRef.current = false;
+    }, []);
+
+  const handleMouseLeave =
+    useCallback(() => {
+      isDraggingRef.current = false;
+    }, []);
+
+  const handleMouseMove =
+    useCallback(
+      (event: React.MouseEvent) => {
+        if (!isDraggingRef.current) {
+          return;
+        }
+
+        handleMove(event.clientX);
+      },
+      [handleMove]
+    );
+
+  const handleTouchMove =
+    useCallback(
+      (event: React.TouchEvent) => {
+        const touch = event.touches[0];
+
+        if (!touch) {
+          return;
+        }
+
+        handleMove(touch.clientX);
+      },
+      [handleMove]
+    );
+
+  const handleSliderChange =
+    useCallback(
+      (
+        event: React.ChangeEvent<HTMLInputElement>
+      ) => {
+        setSliderPosition(
+          Number(event.target.value)
+        );
+      },
+      []
+    );
+
+  const openFullscreenVideo =
+    useCallback((youtubeId: string) => {
+      setActiveFullscreenVideo(youtubeId);
+    }, []);
+
+  const closeFullscreenVideo =
+    useCallback(() => {
+      setActiveFullscreenVideo(null);
+    }, []);
 
   return (
     <div
@@ -489,36 +719,29 @@ export const Hero: React.FC<HeroProps> = ({
         } as React.CSSProperties
       }
     >
-      {/* =====================================================================
-          FIXED PURPLE BACKDROP (EXACT CENTER OF VIEWPORT)
-      ===================================================================== */}
+      {/* PURPLE BACKDROP */}
+
       <div
         className="
-  fixed
-  top-1/2
-  left-1/2
-  -translate-x-1/2
-  -translate-y-1/2
-
-  w-[300px]
-  h-[300px]
-
-  sm:w-[440px]
-  sm:h-[440px]
-
-  md:w-[580px]
-  md:h-[580px]
-
-  lg:w-[680px]
-  lg:h-[680px]
-
-  [@media(max-height:500px)_and_(orientation:landscape)]:w-[300px]
-  [@media(max-height:500px)_and_(orientation:landscape)]:h-[300px]
-
-  rounded-full
-  pointer-events-none
-  z-0
-"
+          fixed
+          top-1/2
+          left-1/2
+          -translate-x-1/2
+          -translate-y-1/2
+          w-[300px]
+          h-[300px]
+          sm:w-[440px]
+          sm:h-[440px]
+          md:w-[580px]
+          md:h-[580px]
+          lg:w-[680px]
+          lg:h-[680px]
+          [@media(max-height:500px)_and_(orientation:landscape)]:w-[300px]
+          [@media(max-height:500px)_and_(orientation:landscape)]:h-[300px]
+          rounded-full
+          pointer-events-none
+          z-0
+        "
         style={{
           background:
             "linear-gradient(to top, #050006 0%, #130719 17%, #250d30 32%, #381149 48%, #5e147d 62%, #7813a2 75%, #980ed1 89%, #b500ff 100%)",
@@ -527,58 +750,68 @@ export const Hero: React.FC<HeroProps> = ({
         }}
       />
 
-      {/* =====================================================================
-          FIXED TOP NAVIGATION (Does not push hero or alter Y-center)
-      ===================================================================== */}
-      <header className="fixed top-0 inset-x-0 z-50 px-6 py-5 md:px-12 md:py-6 flex items-center justify-between bg-transparent  ">
+      {/* NAVIGATION */}
+
+      <header className="fixed top-0 inset-x-0 z-50 px-6 py-5 md:px-12 md:py-6 flex items-center justify-between bg-transparent">
         <div className="flex items-center gap-4">
-          <a href="#hero" className="flex items-center gap-2 group">
+          <a
+            href="#hero"
+            className="flex items-center gap-2 group"
+          >
             <span className="font-mono text-sm tracking-widest uppercase font-semibold text-white/90">
               {name}
             </span>
           </a>
+
           <div className="hidden lg:block w-36 xl:w-40 h-[.5px] bg-white/20" />
         </div>
 
         <nav className="hidden md:flex items-center gap-48 text-sm uppercase tracking-[0.1em] font-medium text-neutral-400">
-          <a href="#about" className="hover:text-white transition-colors">
+          <a
+            href="#about"
+            className="hover:text-white transition-colors"
+          >
             About
           </a>
-          <a href="#works" className="hover:text-white transition-colors">
+
+          <a
+            href="#works"
+            className="hover:text-white transition-colors"
+          >
             Works
           </a>
         </nav>
 
         <div className="flex items-center gap-4">
-      <div className="hidden lg:block w-24 xl:w-40 h-[.5px] bg-white/20" />
+          <div className="hidden lg:block w-24 xl:w-40 h-[.5px] bg-white/20" />
 
-      <a
-        href="tel:+251 98 665 6879"
-        className="px-5 py-2.5 md:px-7 md:py-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black transition-all duration-300 border border-white/20 text-xs md:text-sm font-semibold tracking-wider uppercase"
-      >
-        Let&apos;s Talk
-      </a>
-    </div>
-
+          <a
+            href="tel:+251986656879"
+            className="px-5 py-2.5 md:px-7 md:py-2.5 rounded-full bg-white/10 hover:bg-white text-white hover:text-black transition-all duration-300 border border-white/20 text-xs md:text-sm font-semibold tracking-wider uppercase"
+          >
+            Let&apos;s Talk
+          </a>
+        </div>
       </header>
 
-      {/* =====================================================================
-          HERO PINNED TRACK
-          - Provides scroll distance so hero stays 100% fixed on screen.
-          - Absolutely zero Y movement while fading out.
-      ===================================================================== */}
-      <div id="hero" ref={heroRef} className="relative w-full h-[160vh]">
+      {/* HERO */}
+
+      <div
+        id="hero"
+        ref={heroRef}
+        className="relative w-full h-[160vh]"
+      >
         <section className="sticky top-0 w-full h-screen overflow-hidden flex flex-col justify-between pt-20 pb-4">
           <div
             ref={heroContentRef}
             className="relative w-full h-full flex flex-col justify-between"
-            style={{ opacity: 1, willChange: "opacity" }}
+            style={{
+              opacity: 1,
+              willChange: "opacity",
+            }}
           >
-            {/* ===============================================================
-                SOCIAL ORBIT (EXACTLY OUTSIDE THE BACKDROP CIRCLE CURVE)
-                Backdrop: 300px / 440px / 580px / 680px
-                Orbit:    360px / 510px / 660px / 770px
-            =============================================================== */}
+            {/* SOCIAL ORBIT */}
+
             <div
               className="
                 fixed
@@ -597,98 +830,152 @@ export const Hero: React.FC<HeroProps> = ({
                 z-30
                 pointer-events-none
               "
-              onMouseEnter={() => setOrbitPaused(true)}
-              onMouseLeave={() => setOrbitPaused(false)}
+              onMouseEnter={() =>
+                setOrbitPaused(true)
+              }
+              onMouseLeave={() =>
+                setOrbitPaused(false)
+              }
             >
               <div
                 className="absolute inset-0"
                 style={{
                   animation:
                     "heroSocialOrbit var(--orbit-duration) linear infinite",
-                  animationPlayState: orbitPaused ? "paused" : "running",
+                  animationPlayState:
+                    orbitPaused
+                      ? "paused"
+                      : "running",
+                  willChange: "transform",
                 }}
               >
-                {SOCIAL_LINKS.map((link, idx) => (
-                  <a
-                    key={link.label}
-                    href={link.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={link.label}
-                    style={{
-                      left: ORBIT_POINTS[idx].left,
-                      top: ORBIT_POINTS[idx].top,
-                    }}
-                    className="
-                      absolute
-                      -translate-x-1/2
-                      -translate-y-1/2
-                      pointer-events-auto
-                      cursor-pointer
-                      touch-manipulation
-                      w-10
-                      h-10
-                      sm:w-12
-                      sm:h-12
-                      rounded-full
-                      flex
-                      items-center
-                      justify-center
-                      text-[#d8a7ff]
-                      bg-[#16051f]/90
-                      border
-                      border-[#b500ff]/40
-                      backdrop-blur-md
-                      shadow-[0_0_25px_rgba(181,0,255,0.25)]
-                      hover:text-white
-                      hover:border-[#b500ff]
-                      hover:bg-[#b500ff]/20
-                      hover:shadow-[0_0_35px_rgba(181,0,255,0.6)]
-                      transition-all
-                      duration-300
-                    "
-                  >
-                    <span
-                      className="flex items-center justify-center pointer-events-none"
+                {SOCIAL_LINKS.map(
+                  (link, index) => (
+                    <a
+                      key={link.label}
+                      href={link.href}
+                      target={
+                        link.href.startsWith(
+                          "tel:"
+                        )
+                          ? undefined
+                          : "_blank"
+                      }
+                      rel={
+                        link.href.startsWith(
+                          "tel:"
+                        )
+                          ? undefined
+                          : "noopener noreferrer"
+                      }
+                      aria-label={link.label}
                       style={{
-                        animation:
-                          "heroSocialCounter var(--orbit-duration) linear infinite",
-                        animationPlayState: orbitPaused ? "paused" : "running",
+                        left:
+                          ORBIT_POINTS[index]
+                            .left,
+                        top:
+                          ORBIT_POINTS[index]
+                            .top,
                       }}
+                      className="
+                        absolute
+                        -translate-x-1/2
+                        -translate-y-1/2
+                        pointer-events-auto
+                        cursor-pointer
+                        touch-manipulation
+                        w-10
+                        h-10
+                        sm:w-12
+                        sm:h-12
+                        rounded-full
+                        flex
+                        items-center
+                        justify-center
+                        text-[#d8a7ff]
+                        bg-[#16051f]/90
+                        border
+                        border-[#b500ff]/40
+                        backdrop-blur-md
+                        shadow-[0_0_25px_rgba(181,0,255,0.25)]
+                        hover:text-white
+                        hover:border-[#b500ff]
+                        hover:bg-[#b500ff]/20
+                        hover:shadow-[0_0_35px_rgba(181,0,255,0.6)]
+                        transition-all
+                        duration-300
+                      "
                     >
-                      <SocialIcon name={link.icon} />
-                    </span>
-                  </a>
-                ))}
+                      <span
+                        className="flex items-center justify-center pointer-events-none"
+                        style={{
+                          animation:
+                            "heroSocialCounter var(--orbit-duration) linear infinite",
+                          animationPlayState:
+                            orbitPaused
+                              ? "paused"
+                              : "running",
+                          willChange:
+                            "transform",
+                        }}
+                      >
+                        <SocialIcon
+                          name={link.icon}
+                        />
+                      </span>
+                    </a>
+                  )
+                )}
               </div>
             </div>
 
-            {/* MOBILE UPPER BLOCK */}
+            {/* MOBILE TITLE */}
+
             <div className="md:hidden z-20 px-6 pt-2 text-center flex flex-col items-center">
               <div className="w-full max-w-[300px] py-3 px-4 rounded-2xl">
                 <h1 className="text-xl font-bold tracking-tight text-white uppercase">
                   {name}
                 </h1>
+
                 <p className="text-xs text-neutral-400 mt-1 font-mono tracking-wide">
                   {tagline}
                 </p>
               </div>
             </div>
 
-            {/* CENTER PORTRAIT (ENLARGED & VERTICALLY CENTERED FOR PHONES, SMALL DEVICES & MINI IPADS) */}
+            {/* PORTRAIT */}
+
             <div className="relative w-full flex-1 flex items-end justify-center pointer-events-none">
               <div
-                className={`relative z-10 w-full flex justify-center items-end origin-bottom ${portraitMobileWidth || PORTRAIT_CONFIG.mobileWidth} ${PORTRAIT_CONFIG.desktopWidth} ${portraitMobileScale || PORTRAIT_CONFIG.mobileScale} ${PORTRAIT_CONFIG.mobileTranslateY}`}
+                className={`relative z-10 w-full flex justify-center items-end origin-bottom ${
+                  portraitMobileWidth ||
+                  PORTRAIT_CONFIG.mobileWidth
+                } ${
+                  PORTRAIT_CONFIG.desktopWidth
+                } ${
+                  portraitMobileScale ||
+                  PORTRAIT_CONFIG.mobileScale
+                } ${
+                  PORTRAIT_CONFIG.mobileTranslateY
+                }`}
               >
                 <img
                   src={portraitSrc}
                   alt={name}
                   className="w-full h-auto object-cover object-bottom select-none pointer-events-none"
+                  loading="eager"
+                  decoding="async"
+                  fetchPriority="high"
+                  onLoad={handlePortraitLoad}
+                  draggable={false}
                   style={{
-                    maxHeight: PORTRAIT_CONFIG.mobileMaxHeight,
-                    filter: "contrast(1.04) brightness(0.96)",
+                    maxHeight:
+                      PORTRAIT_CONFIG.mobileMaxHeight,
+                    filter:
+                      "contrast(1.04) brightness(0.96)",
                   }}
                 />
+
                 <div
                   className="absolute inset-x-0 -bottom-28 pointer-events-none"
                   style={{
@@ -699,12 +986,14 @@ export const Hero: React.FC<HeroProps> = ({
                 />
               </div>
 
-              {/* DESKTOP LEFT CARD */}
+              {/* DESKTOP LEFT */}
+
               <div className="hidden md:block absolute left-8 lg:left-14 top-1/2 -translate-y-1/2 z-20 max-w-xs lg:max-w-sm pointer-events-auto">
                 <div className="p-5 rounded-2xl hover:border-[#b500ff]/30 transition-all duration-300">
                   <span className="text-[11px] font-mono uppercase tracking-[0.25em] text-[#d8a7ff] block mb-1">
                     Introduction
                   </span>
+
                   <p className="text-base lg:text-lg font-semibold tracking-wide text-neutral-100">
                     Creative Developer
                     <br />
@@ -713,22 +1002,30 @@ export const Hero: React.FC<HeroProps> = ({
                 </div>
               </div>
 
-              {/* DESKTOP RIGHT CARD */}
+              {/* DESKTOP RIGHT */}
+
               <div className="hidden md:block absolute right-8 lg:right-14 bottom-10 z-20 max-w-xs lg:max-w-md pointer-events-auto">
-                <div className="p-6 rounded-2xl  shadow-2xl">
+                <div className="p-6 rounded-2xl shadow-2xl">
                   <h3 className="text-sm font-bold tracking-widest uppercase text-white/90 mb-2">
                     Based in Addis Ababa
                   </h3>
+
                   <p className="text-xs lg:text-sm text-neutral-400 leading-relaxed">
-                    Specialized in crafting cinematic visual stories, dynamic edits, and distinctive digital experiences, with a focus on creative storytelling, precise pacing, and modern visual identity
+                    Specialized in crafting cinematic
+                    visual stories, dynamic edits, and
+                    distinctive digital experiences,
+                    with a focus on creative storytelling,
+                    precise pacing, and modern visual
+                    identity
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* MOBILE BOTTOM HINT */}
+            {/* MOBILE SCROLL */}
+
             <div className="md:hidden z-20 w-full px-6 pb-4 pt-1 flex justify-end">
-              <div className="px-4 py-2 rounded-xl  text-right">
+              <div className="px-4 py-2 rounded-xl text-right">
                 <p className="text-xs font-mono font-medium tracking-wider uppercase text-neutral-300">
                   Scroll to explore ↓
                 </p>
@@ -738,19 +1035,19 @@ export const Hero: React.FC<HeroProps> = ({
         </section>
       </div>
 
-      {/* =====================================================================
-          ABOUT SECTION
-      ===================================================================== */}
+      {/* ABOUT */}
+
       <section
         id="about"
         ref={aboutRef}
-        className="relative z-10 w-full min-h-screen py-24 px-6 md:px-14 lg:px-24 flex items-center justify-center "
+        className="relative z-10 w-full min-h-screen py-24 px-6 md:px-14 lg:px-24 flex items-center justify-center"
       >
         <div className="w-full max-w-5xl rounded-3xl p-8 sm:p-12 md:p-16">
           <div className="flex items-center gap-3 mb-6">
             <span className="h-[1px] w-8 bg-[#b500ff]" />
+
             <span
-              data-glitch-text=" About The Me"
+              data-glitch-text="About The Me"
               className="text-xs font-mono uppercase tracking-[0.3em] text-[#d8a7ff]"
             >
               About The Me
@@ -761,58 +1058,59 @@ export const Hero: React.FC<HeroProps> = ({
             data-glitch-text="HI I'AM BEREKET"
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-white mb-8 leading-[1.15]"
           >
-            HI I'AM BEREKET
+            HI I&apos;AM BEREKET
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-neutral-300 text-sm sm:text-base leading-relaxed font-light">
-            <p data-glitch-text="I am a digital artisan operating at the intersection of cinematic video craft and cutting-edge web architecture. With a relentless focus on aesthetic rhythm, color dynamics, and visual pacing, I transform raw footage and ideas into evocative digital tapestries.">
-             I am a digital artisan focused on the art of cinematic video editing and visual storytelling. With a relentless focus on aesthetic rhythm, color dynamics, sound, and visual pacing, I transform raw footage and ideas into immersive, emotionally driven visual experiences.
+            <p>
+              I am a digital artisan focused on the art of
+              cinematic video editing and visual
+              storytelling. With a relentless focus on
+              aesthetic rhythm, color dynamics, sound, and
+              visual pacing, I transform raw footage and
+              ideas into immersive, emotionally driven
+              visual experiences.
             </p>
-            <p data-glitch-text="Every frame and interaction is measured for maximum visceral impact. Whether grading footage for a high-concept film, directing soundscapes, or engineering bespoke web environments, the mission remains unwavering: elevating vision past conventional boundaries.">
-              Every cut, transition, and frame is crafted for maximum visual impact. Whether shaping the atmosphere through cinematic color grading, designing immersive soundscapes, or refining visual pacing, the mission remains unwavering: transforming raw footage into compelling stories that push creative vision beyond conventional boundaries.
+
+            <p>
+              Every cut, transition, and frame is crafted
+              for maximum visual impact. Whether shaping
+              the atmosphere through cinematic color
+              grading, designing immersive soundscapes,
+              or refining visual pacing, the mission
+              remains unwavering: transforming raw footage
+              into compelling stories that push creative
+              vision beyond conventional boundaries.
             </p>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 pt-10 mt-10 border-t border-white/10">
             <div>
-              <span
-                data-glitch-text="150+"
-                className="block text-2xl sm:text-3xl font-bold font-mono text-white"
-              >
+              <span className="block text-2xl sm:text-3xl font-bold font-mono text-white">
                 150+
               </span>
-              <span
-                data-glitch-text="Projects Shipped"
-                className="text-xs tracking-wider uppercase text-neutral-400"
-              >
+
+              <span className="text-xs tracking-wider uppercase text-neutral-400">
                 Projects Shipped
               </span>
             </div>
+
             <div>
-              <span
-                data-glitch-text="4K+"
-                className="block text-2xl sm:text-3xl font-bold font-mono text-white"
-              >
+              <span className="block text-2xl sm:text-3xl font-bold font-mono text-white">
                 4K+
               </span>
-              <span
-                data-glitch-text="Graded Frames"
-                className="text-xs tracking-wider uppercase text-neutral-400"
-              >
+
+              <span className="text-xs tracking-wider uppercase text-neutral-400">
                 Graded Frames
               </span>
             </div>
+
             <div>
-              <span
-                data-glitch-text="100%"
-                className="block text-2xl sm:text-3xl font-bold font-mono text-white"
-              >
+              <span className="block text-2xl sm:text-3xl font-bold font-mono text-white">
                 100%
               </span>
-              <span
-                data-glitch-text="Creative Ownership"
-                className="text-xs tracking-wider uppercase text-neutral-400"
-              >
+
+              <span className="text-xs tracking-wider uppercase text-neutral-400">
                 Creative Ownership
               </span>
             </div>
@@ -820,9 +1118,8 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
       </section>
 
-      {/* =====================================================================
-          WORKS SECTION
-      ===================================================================== */}
+      {/* WORKS */}
+
       <section
         id="works"
         className="relative z-10 w-full min-h-screen py-24 px-6 md:px-14 lg:px-24 flex flex-col justify-center"
@@ -831,24 +1128,31 @@ export const Hero: React.FC<HeroProps> = ({
           <div>
             <div className="flex items-center gap-3 mb-3">
               <span className="h-[1px] w-8 bg-[#b500ff]" />
+
               <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#d8a7ff]">
                 Selected Works
               </span>
             </div>
+
             <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white">
               Visual Archives
             </h2>
           </div>
+
           <p className="text-xs sm:text-sm text-neutral-400 font-mono">
             Click any window to view in full resolution
           </p>
         </div>
 
         <div className="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 gap-6">
-          {worksList.map((item) => (
+          {WORKS_LIST.map((item) => (
             <div
               key={item.id}
-              onClick={() => setActiveFullscreenVideo(item.youtubeId)}
+              onClick={() =>
+                openFullscreenVideo(
+                  item.youtubeId
+                )
+              }
               className="group relative cursor-pointer rounded-2xl overflow-hidden bg-black/60 backdrop-blur-md border border-white/10 hover:border-[#b500ff]/50 transition-all duration-300 shadow-xl"
             >
               <div className="relative aspect-video w-full pointer-events-none overflow-hidden">
@@ -856,8 +1160,10 @@ export const Hero: React.FC<HeroProps> = ({
                   className="w-full h-full scale-105 group-hover:scale-110 transition-transform duration-700"
                   src={`https://www.youtube.com/embed/${item.youtubeId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${item.youtubeId}&playsinline=1`}
                   title={item.title}
+                  loading="lazy"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 />
+
                 <div className="absolute inset-0 bg-transparent" />
               </div>
 
@@ -866,10 +1172,12 @@ export const Hero: React.FC<HeroProps> = ({
                   <h4 className="text-sm font-semibold text-white group-hover:text-[#d8a7ff] transition-colors">
                     {item.title}
                   </h4>
+
                   <span className="text-[11px] font-mono uppercase tracking-wider text-neutral-400">
                     {item.category}
                   </span>
                 </div>
+
                 <div className="w-8 h-8 rounded-full border border-white/20 flex items-center justify-center text-xs group-hover:bg-white group-hover:text-black transition-all">
                   ↗
                 </div>
@@ -879,17 +1187,17 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
       </section>
 
-      {/* =====================================================================
-          FULLSCREEN VIDEO MODAL
-      ===================================================================== */}
+      {/* FULLSCREEN VIDEO */}
+
       {activeFullscreenVideo && (
         <div className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex items-center justify-center p-4 sm:p-10">
           <button
-            onClick={() => setActiveFullscreenVideo(null)}
+            onClick={closeFullscreenVideo}
             className="absolute top-6 right-6 px-4 py-2 rounded-full bg-white/10 hover:bg-white hover:text-black text-white text-xs font-mono uppercase tracking-widest border border-white/20 transition-all"
           >
             Close [ESC]
           </button>
+
           <div className="w-full max-w-6xl aspect-video rounded-2xl overflow-hidden border border-white/20 shadow-2xl">
             <iframe
               className="w-full h-full"
@@ -902,9 +1210,8 @@ export const Hero: React.FC<HeroProps> = ({
         </div>
       )}
 
-      {/* =====================================================================
-          BEFORE / AFTER SECTION
-      ===================================================================== */}
+      {/* BEFORE / AFTER */}
+
       <section
         id="comparison"
         className="relative z-10 w-full min-h-screen py-24 px-6 md:px-14 lg:px-24 flex flex-col items-center justify-center"
@@ -912,32 +1219,36 @@ export const Hero: React.FC<HeroProps> = ({
         <div className="max-w-4xl w-full text-center mb-10">
           <div className="inline-flex items-center gap-2 mb-3">
             <span className="h-[1px] w-6 bg-[#b500ff]" />
+
             <span className="text-xs font-mono uppercase tracking-[0.3em] text-[#d8a7ff]">
               Interactive Comparison
             </span>
+
             <span className="h-[1px] w-6 bg-[#b500ff]" />
           </div>
 
           <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-white mb-3">
-            Before & After Edit
+            Before &amp; After Edit
           </h2>
 
           <p className="text-xs sm:text-sm text-neutral-400 max-w-lg mx-auto">
-            Drag the central slider node left or right to inspect the raw camera
-            capture versus the finalized cinematic color-graded master.
+            Drag the central slider node left or right
+            to inspect the raw camera capture versus the
+            finalized cinematic color-graded master.
           </p>
         </div>
 
         <div
           ref={comparisonContainerRef}
-          onMouseDown={() => (isDraggingRef.current = true)}
-          onMouseUp={() => (isDraggingRef.current = false)}
-          onMouseLeave={() => (isDraggingRef.current = false)}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseLeave}
           onMouseMove={handleMouseMove}
           onTouchMove={handleTouchMove}
           className="relative w-full max-w-5xl aspect-video rounded-3xl overflow-hidden border border-white/20 shadow-2xl select-none cursor-ew-resize bg-black"
         >
           {/* AFTER */}
+
           <div className="absolute inset-0 w-full h-full">
             <video
               ref={afterVideoRef}
@@ -946,20 +1257,26 @@ export const Hero: React.FC<HeroProps> = ({
               muted
               loop
               playsInline
+              preload="metadata"
               className="w-full h-full object-cover"
               style={{
-                filter: "saturate(1.3) contrast(1.15) brightness(1.05)",
+                filter:
+                  "saturate(1.3) contrast(1.15) brightness(1.05)",
               }}
             />
+
             <span className="absolute top-4 right-4 z-10 px-3 py-1.5 rounded-md bg-black/60 backdrop-blur-md border border-white/20 text-[10px] font-mono uppercase tracking-widest text-[#d8a7ff]">
               After (Graded)
             </span>
           </div>
 
           {/* BEFORE */}
+
           <div
             className="absolute inset-y-0 left-0 overflow-hidden"
-            style={{ width: `${sliderPosition}%` }}
+            style={{
+              width: `${sliderPosition}%`,
+            }}
           >
             <div className="relative h-full w-[100vw] max-w-5xl">
               <video
@@ -969,18 +1286,22 @@ export const Hero: React.FC<HeroProps> = ({
                 muted
                 loop
                 playsInline
+                preload="metadata"
                 className="w-full h-full object-cover"
                 style={{
-                  filter: "saturate(0.55) contrast(0.85) brightness(0.9)",
+                  filter:
+                    "saturate(0.55) contrast(0.85) brightness(0.9)",
                 }}
               />
+
               <span className="absolute top-4 left-4 z-10 px-3 py-1.5 rounded-md bg-black/60 backdrop-blur-md border border-white/20 text-[10px] font-mono uppercase tracking-widest text-neutral-300">
                 Before (Raw Log)
               </span>
             </div>
           </div>
 
-          {/* SLIDER HANDLE */}
+          {/* SLIDER */}
+
           <div
             className="absolute top-0 bottom-0 pointer-events-none z-20 flex items-center justify-center"
             style={{
@@ -989,8 +1310,11 @@ export const Hero: React.FC<HeroProps> = ({
             }}
           >
             <div className="w-[2px] h-full bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]" />
+
             <div className="absolute w-10 h-10 rounded-full bg-white text-black font-bold text-xs flex items-center justify-center shadow-[0_0_20px_rgba(0,0,0,0.8)] border border-neutral-300">
-              <span className="select-none tracking-tighter">◀▶</span>
+              <span className="select-none tracking-tighter">
+                ◀▶
+              </span>
             </div>
           </div>
         </div>
@@ -1001,30 +1325,33 @@ export const Hero: React.FC<HeroProps> = ({
             min={0}
             max={100}
             value={sliderPosition}
-            onChange={(e) => setSliderPosition(Number(e.target.value))}
+            onChange={handleSliderChange}
             className="w-full accent-[#b500ff] cursor-pointer"
           />
         </div>
       </section>
 
-      {/* =====================================================================
-          FOOTER
-      ===================================================================== */}
-    
-
-      {/* =====================================================================
-          ANIMATION KEYFRAMES
-      ===================================================================== */}
       <style
         dangerouslySetInnerHTML={{
           __html: `
             @keyframes heroSocialOrbit {
-              from { transform: rotate(0deg); }
-              to { transform: rotate(360deg); }
+              from {
+                transform: rotate(0deg);
+              }
+
+              to {
+                transform: rotate(360deg);
+              }
             }
+
             @keyframes heroSocialCounter {
-              from { transform: rotate(0deg); }
-              to { transform: rotate(-360deg); }
+              from {
+                transform: rotate(0deg);
+              }
+
+              to {
+                transform: rotate(-360deg);
+              }
             }
           `,
         }}
