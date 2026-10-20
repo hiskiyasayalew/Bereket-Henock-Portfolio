@@ -1047,10 +1047,10 @@ const Hero: React.FC<HeroProps> = ({
             <span className="h-[1px] w-8 bg-[#b500ff]" />
 
             <span
-              data-glitch-text="About The Me"
+              data-glitch-text="About Me"
               className="text-xs font-mono uppercase tracking-[0.3em] text-[#d8a7ff]"
             >
-              About The Me
+              About Me
             </span>
           </div>
 
